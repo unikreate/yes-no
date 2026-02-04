@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You ❤️</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+            overflow-x: hidden;
+            /* Custom Heart Cursor */
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23f43f5e' stroke='white' stroke-width='2'><path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'></path></svg>") 16 16, auto;
+        }
+
+        /* Interactive Elements Cursor (Darker Red) */
+        button, a, .cursor-pointer {
+            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23e11d48' stroke='white' stroke-width='2'><path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'></path></svg>") 16 16, pointer !important;
+        }
+        
+        .font-handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Floating Hearts Background Animation */
+        .heart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+        
+        .floating-heart {
+            position: absolute;
+            color: rgba(244, 63, 94, 0.1); /* Rose-500 with low opacity */
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+        }
+
+        /* Polaroid Effect */
+        .polaroid {
+            background: white;
+            padding: 12px 12px 40px 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: rotate(-2deg);
+            transition: all 0.4s ease;
+        }
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+            z-index: 10;
+            box-shadow: 0 20px 30px rgba(244, 63, 94, 0.2);
+        }
+        .polaroid:nth-child(even) {
+            transform: rotate(2deg);
+        }
+
+        /* Pulse Animation for Main Heart */
+        .pulse-heart {
+            animation: heartbeat 1.5s infinite;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            14% { transform: scale(1.1); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.1); }
+            70% { transform: scale(1); }
+        }
+
+        /* Glassmorphism Card */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        /* Hide Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #fda4af; 
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="bg-rose-50 text-slate-800 relative">
+
+    <!-- Background Animation Container -->
+    <div id="heart-container" class="heart-bg"></div>
+
+    <!-- Loading Overlay -->
+    <div id="loader" class="fixed inset-0 z-50 bg-rose-50 flex items-center justify-center transition-opacity duration-1000">
+        <div class="text-center">
+            <div class="text-6xl text-rose-500 pulse-heart mb-4">❤️</div>
+            <p class="text-rose-400 font-bold tracking-widest animate-pulse">PREPARING SURPRISE...</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="relative z-10 max-w-4xl mx-auto px-4 py-12 opacity-0 transition-opacity duration-1000" id="main-content">
+        
+        <!-- Header -->
+        <header class="text-center mb-20">
+            <h1 class="font-handwriting text-6xl md:text-8xl text-rose-500 mb-4 drop-shadow-sm">Hey [Friend's Name]</h1>
+            <p class="text-xl text-slate-500 max-w-lg mx-auto leading-relaxed">
+                I made this little digital corner just for you, because a normal card wasn't enough to hold all this appreciation.
+            </p>
+        </header>
+
+        <!-- Gallery Section -->
+        <section class="mb-24">
+            <h2 class="text-3xl font-bold text-slate-700 text-center mb-12">Our Favorite Moments</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
+                <!-- Photo 1 -->
+                <div class="polaroid cursor-pointer group">
+                    <div class="aspect-[4/5] bg-slate-200 overflow-hidden rounded-sm relative">
+                        <!-- Replace src with your images -->
+                        <img src="Screenshot 2026-01-28 230201.jpg" alt="Memory" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    </div>
+                    <p class="text-center font-handwriting text-2xl text-slate-600 mt-4">That one time...</p>
+                </div>
+                
+                <!-- Photo 2 -->
+                <div class="polaroid cursor-pointer group md:mt-12">
+                    <div class="aspect-[4/5] bg-slate-200 overflow-hidden rounded-sm relative">
+                        <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&q=80&w=600" alt="Memory" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    </div>
+                    <p class="text-center font-handwriting text-2xl text-slate-600 mt-4">Your smile ❤️</p>
+                </div>
+
+                <!-- Photo 3 -->
+                <div class="polaroid cursor-pointer group">
+                    <div class="aspect-[4/5] bg-slate-200 overflow-hidden rounded-sm relative">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600" alt="Memory" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    </div>
+                    <p class="text-center font-handwriting text-2xl text-slate-600 mt-4">Best day ever</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reasons Section -->
+        <section class="mb-24">
+            <div class="glass-card rounded-3xl p-8 md:p-12 shadow-xl border-t-4 border-rose-400">
+                <h2 class="text-3xl font-bold text-slate-700 mb-8 text-center">Why You're Special</h2>
+                <div class="space-y-6">
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-xl">1</div>
+                        <p class="text-lg text-slate-600 font-medium">You have the kindest heart I've ever known.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-xl">2</div>
+                        <p class="text-lg text-slate-600 font-medium">Your laugh is literally my favorite sound.</p>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-xl">3</div>
+                        <p class="text-lg text-slate-600 font-medium">You inspire me to be a better person every day.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- The Question Section -->
+        <section class="text-center py-20 min-h-[60vh] flex flex-col items-center justify-center relative">
+            <h2 class="font-handwriting text-5xl md:text-7xl text-rose-600 mb-12">Will you be my Valentine?</h2>
+            
+            <div class="flex flex-col md:flex-row gap-8 items-center justify-center relative w-full h-32">
+                <button id="yesBtn" onclick="acceptValentine()" class="px-12 py-4 bg-rose-500 text-white rounded-full font-bold text-xl shadow-lg hover:bg-rose-600 hover:scale-110 transition-all transform z-10">
+                    YES! 💖
+                </button>
+                
+                <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()" class="px-12 py-4 bg-slate-200 text-slate-500 rounded-full font-bold text-xl hover:bg-slate-300 transition-all absolute md:static">
+                    No 🙈
+                </button>
+            </div>
+
+            <div id="success-msg" class="hidden mt-12 transform transition-all duration-500">
+                <p class="text-2xl font-bold text-slate-700">Yay! It's a date! 🥂</p>
+                <p class="text-slate-500 mt-2">I'll pick you up at 7 PM.</p>
+            </div>
+        </section>
+
+        <footer class="text-center py-12 text-slate-400 text-sm">
+            Made with ❤️ and code.
+        </footer>
+    </main>
+
+    <script>
+        // 1. Loading Screen Logic
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                const main = document.getElementById('main-content');
+                
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                    main.style.opacity = '1';
+                    createFloatingHearts();
+                }, 1000);
+            }, 1500); // Fake loading time
+        });
+
+        // 2. Floating Hearts Background
+        function createFloatingHearts() {
+            const container = document.getElementById('heart-container');
+            const heartCount = 20; // Number of background hearts
+
+            for(let i = 0; i < heartCount; i++) {
+                const heart = document.createElement('div');
+                heart.innerHTML = '❤️';
+                heart.classList.add('floating-heart');
+                
+                // Random positioning and sizing
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.animationDuration = (Math.random() * 10 + 10) + 's'; // 10-20s float time
+                heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                
+                container.appendChild(heart);
+            }
+        }
+
+        // 3. The "Running Away" No Button
+        const noBtn = document.getElementById('noBtn');
+        const yesBtn = document.getElementById('yesBtn');
+        
+        function moveButton() {
+            // Get viewport dimensions
+            const maxWidth = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxHeight = window.innerHeight - noBtn.offsetHeight - 20;
+
+            // Generate random position
+            const newX = Math.random() * maxWidth;
+            const newY = Math.random() * maxHeight;
+
+            // Make it absolute positioning to move freely
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = newX + 'px';
+            noBtn.style.top = newY + 'px';
+            
+            // Add a funny scale effect
+            noBtn.style.transform = 'scale(0.9)';
+            
+            // Make the YES button grow slightly to encourage clicking it
+            let currentScale = parseFloat(yesBtn.style.transform.replace('scale(', '')) || 1;
+            yesBtn.style.transform = `scale(${currentScale + 0.1})`;
+        }
+
+        // 4. Acceptance Logic & Confetti
+        function acceptValentine() {
+            const successMsg = document.getElementById('success-msg');
+            const noButton = document.getElementById('noBtn');
+            
+            // Hide No button
+            noButton.style.display = 'none';
+            
+            // Show message
+            successMsg.classList.remove('hidden');
+            successMsg.classList.add('animate-bounce');
+
+            // Trigger Confetti
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              var particleCount = 50 * (timeLeft / duration);
+              // since particles fall down, start a bit higher than random
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
