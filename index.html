@@ -3,307 +3,1144 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>For You ❤️</title>
+    <title>Apex Automotive | M-Style Experience</title>
+    
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- Confetti Library -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
-    <style>
-        body {
-            font-family: 'Nunito', sans-serif;
-            background: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
-            overflow-x: hidden;
-            /* Custom Heart Cursor */
-            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23f43f5e' stroke='white' stroke-width='2'><path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'></path></svg>") 16 16, auto;
-        }
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Exo+2:ital,wght@0,300;0,500;0,700;0,900;1,300&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        /* Interactive Elements Cursor (Darker Red) */
-        button, a, .cursor-pointer {
-            cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 24 24' fill='%23e11d48' stroke='white' stroke-width='2'><path d='M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z'></path></svg>") 16 16, pointer !important;
+    <style>
+        :root {
+            --primary: #14b8a6; /* Teal 500 */
+            --primary-dark: #0f766e;
+            --accent: #ef4444;  /* Red 500 */
+            --accent-glow: rgba(239, 68, 68, 0.6);
+            --dark: #111827;    /* Gray 900 */
+            --dark-glass: rgba(17, 24, 39, 0.85);
         }
         
-        .font-handwriting {
-            font-family: 'Dancing Script', cursive;
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background-color: var(--dark);
+            /* Comic Book Halftone Pattern */
+            background-image: 
+                radial-gradient(var(--primary-dark) 15%, transparent 16%),
+                radial-gradient(var(--primary-dark) 15%, transparent 16%);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            color: white;
+            overflow-x: hidden;
+            margin: 0;
+            user-select: none; /* Prevent text selection on touch */
+            -webkit-user-select: none;
+            touch-action: none; /* Prevent scrolling on mobile while playing */
+            
+            /* Custom Red/Teal Cursor */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="%23111827" stroke="%23000" stroke-width="2"/><circle cx="16" cy="16" r="11" fill="none" stroke="%23ef4444" stroke-width="2" stroke-dasharray="2 3"/><circle cx="16" cy="16" r="4" fill="%2314b8a6"/><path d="M16 11 L16 21 M11 16 L21 16" stroke="%23fff" stroke-width="2"/></svg>') 16 16, auto;
         }
 
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+        /* Interactive Elements Pointer */
+        a, button, input, select, .cursor-pointer {
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="%23ef4444" stroke="%23fff" stroke-width="2"/><circle cx="16" cy="16" r="5" fill="%23fff"/><path d="M16 11 L16 21 M11 16 L21 16" stroke="%23ef4444" stroke-width="2"/></svg>') 16 16, pointer;
         }
 
-        /* Floating Hearts Background Animation */
-        .heart-bg {
+        h1, h2, h3, .brand-font {
+            font-family: 'Rajdhani', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* Cartoonish Header Style */
+        h1 {
+            font-family: 'Rajdhani', sans-serif;
+            font-style: italic;
+            text-shadow: 4px 4px 0px var(--primary-dark);
+        }
+
+        /* 3D Canvas fixed in background */
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: all;
+        }
+
+        /* Content overlay */
+        #content {
+            position: relative;
+            z-index: 10;
+            /* CRITICAL: Allows clicks to pass through empty areas to the 3D canvas */
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        /* Re-enable pointer events for interactive UI elements */
+        nav, section, footer, button, a, input, select, .glass-panel {
+            pointer-events: auto;
+        }
+
+        /* Enhanced Glass Panel with Teal Border */
+        .glass-panel {
+            background: var(--dark-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 2px solid var(--primary);
+            box-shadow: 0 10px 0 0 rgba(0,0,0,0.5); /* Cartoon hard shadow */
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border-radius: 12px;
+        }
+
+        /* Cartoon Button */
+        .btn-cartoon {
+            position: relative;
+            background: var(--primary);
+            color: #000;
+            border: 2px solid #fff;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 12px 24px;
+            transform: skew(-10deg);
+            box-shadow: 5px 5px 0px #000;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-cartoon:hover {
+            background: var(--accent);
+            color: #fff;
+            transform: skew(-10deg) translate(-2px, -2px);
+            box-shadow: 7px 7px 0px #000;
+        }
+
+        .btn-cartoon-outline {
+            position: relative;
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 12px 24px;
+            transform: skew(-10deg);
+            box-shadow: 5px 5px 0px rgba(20, 184, 166, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .btn-cartoon-outline:hover {
+            background: var(--primary);
+            color: #000;
+            box-shadow: 5px 5px 0px var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Enhanced Service Card */
+        .service-card {
+            border: 2px solid var(--primary-dark);
+            background: rgba(17, 24, 39, 0.9);
+        }
+        
+        .service-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 15px 0 -5px var(--accent); /* Hard shadow */
+        }
+
+        .service-card svg {
+            filter: drop-shadow(0 0 0 rgba(0,0,0,0));
+            transition: 0.3s;
+            color: var(--primary);
+        }
+        
+        .service-card:hover svg {
+            color: var(--accent);
+            transform: scale(1.2) rotate(5deg);
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border: 2px solid #111827;
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+        
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+        
+        /* Gradient Text */
+        .text-gradient {
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-style: italic;
+        }
+
+        /* GAME UI (Hidden by default) */
+        #game-ui {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 50;
             pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
         }
-        
-        .floating-heart {
+
+        .game-hud {
             position: absolute;
-            color: rgba(244, 63, 94, 0.1); /* Rose-500 with low opacity */
-            animation: floatUp linear infinite;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(0,0,0,0.8);
+            border: 2px solid var(--primary);
+            padding: 1rem;
+            border-radius: 10px;
+            color: white;
+            font-family: 'Rajdhani', sans-serif;
+            pointer-events: auto;
+            text-align: right;
         }
 
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) scale(0.5); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translateY(-20vh) scale(1.5); opacity: 0; }
+        .game-overlay {
+            position: absolute;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            pointer-events: auto;
+            width: 90%;
+            max-width: 600px;
         }
 
-        /* Polaroid Effect */
-        .polaroid {
-            background: white;
-            padding: 12px 12px 40px 12px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            transform: rotate(-2deg);
-            transition: all 0.4s ease;
-        }
-        .polaroid:hover {
-            transform: rotate(0deg) scale(1.05);
-            z-index: 10;
-            box-shadow: 0 20px 30px rgba(244, 63, 94, 0.2);
-        }
-        .polaroid:nth-child(even) {
-            transform: rotate(2deg);
+        #tutorial-text {
+            transition: opacity 1s ease-out;
         }
 
-        /* Pulse Animation for Main Heart */
-        .pulse-heart {
-            animation: heartbeat 1.5s infinite;
-        }
-        @keyframes heartbeat {
-            0% { transform: scale(1); }
-            14% { transform: scale(1.1); }
-            28% { transform: scale(1); }
-            42% { transform: scale(1.1); }
-            70% { transform: scale(1); }
-        }
-
-        /* Glassmorphism Card */
-        .glass-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
+        #game-over-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 60;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            pointer-events: auto;
         }
 
-        /* Hide Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #fda4af; 
+        .key-hint {
+            display: inline-block;
+            background: #333;
+            border: 1px solid #555;
+            padding: 0.2rem 0.5rem;
             border-radius: 4px;
+            margin: 0 0.2rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .exit-btn {
+            background: var(--accent);
+            color: white;
+            border: 2px solid white;
+            padding: 0.5rem 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-transform: uppercase;
+            border-radius: 4px;
+            box-shadow: 4px 4px 0 black;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+        .exit-btn:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 black;
         }
     </style>
 </head>
-<body class="bg-rose-50 text-slate-800 relative">
+<body>
 
-    <!-- Background Animation Container -->
-    <div id="heart-container" class="heart-bg"></div>
+    <!-- 3D Background Container -->
+    <div id="canvas-container"></div>
 
-    <!-- Loading Overlay -->
-    <div id="loader" class="fixed inset-0 z-50 bg-rose-50 flex items-center justify-center transition-opacity duration-1000">
-        <div class="text-center">
-            <div class="text-6xl text-rose-500 pulse-heart mb-4">❤️</div>
-            <p class="text-rose-400 font-bold tracking-widest animate-pulse">PREPARING SURPRISE...</p>
+    <!-- GAME UI LAYER -->
+    <div id="game-ui">
+        <div class="game-overlay">
+            <h2 class="text-4xl font-black italic text-white mb-2" style="text-shadow: 2px 2px 0 var(--primary);">ENDLESS RUNNER</h2>
+            <div id="tutorial-text" class="bg-black/50 p-2 rounded backdrop-blur text-sm">
+                Desktop: Use <span class="key-hint">A</span> / <span class="key-hint">D</span> or <span class="key-hint">ARROWS</span> to Dodge<br>
+                Mobile: Tap <span class="key-hint">LEFT</span> or <span class="key-hint">RIGHT</span> side of screen
+            </div>
+            <button class="exit-btn mt-4 bg-gray-600 border-gray-400 hover:bg-gray-500" onclick="stopGame()">Exit Game</button>
+        </div>
+        <div class="game-hud">
+            <div class="text-xl font-bold">SCORE: <span id="score-display" class="text-yellow-400 text-3xl">0</span></div>
+            <div class="text-sm font-bold opacity-70">SPEED: <span id="speed-meter" class="text-teal-400">0</span> KM/H</div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <main class="relative z-10 max-w-4xl mx-auto px-4 py-12 opacity-0 transition-opacity duration-1000" id="main-content">
+    <!-- GAME OVER SCREEN -->
+    <div id="game-over-screen">
+        <h2 class="text-6xl font-black italic text-red-500 mb-4" style="text-shadow: 4px 4px 0 white;">CRASHED!</h2>
+        <div class="text-2xl text-white mb-8 font-bold">FINAL SCORE: <span id="final-score" class="text-yellow-400">0</span></div>
+        <div class="text-gray-300 mb-8 animate-pulse text-sm uppercase tracking-widest">Press ENTER, SPACE or Tap to Restart</div>
+        <div class="flex space-x-4">
+            <button class="btn-cartoon text-xl" onclick="resetGame()">TRY AGAIN</button>
+            <button class="btn-cartoon-outline text-white border-white hover:bg-white hover:text-black" onclick="stopGame()">QUIT</button>
+        </div>
+    </div>
+
+    <!-- Main Content Overlay -->
+    <div id="content">
         
-        <!-- Header -->
-        <header class="text-center mb-20">
-            <h1 class="font-handwriting text-6xl md:text-8xl text-rose-500 mb-4 drop-shadow-sm">Hey [Friend's Name]</h1>
-            <p class="text-xl text-slate-500 max-w-lg mx-auto leading-relaxed">
-                I made this little digital corner just for you, because a normal card wasn't enough to hold all this appreciation.
-            </p>
-        </header>
-
-        <!-- Gallery Section -->
-        <section class="mb-24">
-            <h2 class="text-3xl font-bold text-slate-700 text-center mb-12">Our Favorite Moments</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-4">
-                <!-- Photo 1 -->
-                <div class="polaroid cursor-pointer group">
-                    <div class="aspect-[4/5] bg-slate-200 overflow-hidden rounded-sm relative">
-                        <!-- Replace src with your images -->
-                        <img src="Screenshot 2026-01-28 230201.jpg" alt="Memory" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                    </div>
-                    <p class="text-center font-handwriting text-2xl text-slate-600 mt-4">That one time...</p>
+        <!-- Navigation -->
+        <nav class="glass-panel mx-4 mt-4 sticky top-4 border-b-0 z-50 rounded-xl">
+            <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <!-- Simple SVG Icon -->
+                    <svg class="w-8 h-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    <span class="text-3xl font-black italic tracking-wider brand-font text-white" style="text-shadow: 2px 2px 0 var(--primary);">APEX<span class="text-red-500">M</span></span>
                 </div>
-                
-                <!-- Photo 2 -->
-                <div class="polaroid cursor-pointer group md:mt-12">
-                    <div class="aspect-[4/5] bg-slate-200 overflow-hidden rounded-sm relative">
-                        <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&q=80&w=600" alt="Memory" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                    </div>
-                    <p class="text-center font-handwriting text-2xl text-slate-600 mt-4">Your smile ❤️</p>
+                <div class="hidden md:flex space-x-8 text-sm font-bold tracking-wider items-center">
+                    <a href="#home" class="hover:text-teal-400 transition-colors uppercase">Home</a>
+                    <a href="#services" class="hover:text-teal-400 transition-colors uppercase">Services</a>
+                    <a href="#tech" class="hover:text-teal-400 transition-colors uppercase">M-Power</a>
+                    <a href="#contact" class="px-5 py-2 btn-cartoon text-xs no-underline">BOOK NOW</a>
                 </div>
-
-                <!-- Photo 3 -->
-                <div class="polaroid cursor-pointer group">
-                    <div class="aspect-[4/5] bg-slate-200 overflow-hidden rounded-sm relative">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=600" alt="Memory" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                    </div>
-                    <p class="text-center font-handwriting text-2xl text-slate-600 mt-4">Best day ever</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Reasons Section -->
-        <section class="mb-24">
-            <div class="glass-card rounded-3xl p-8 md:p-12 shadow-xl border-t-4 border-rose-400">
-                <h2 class="text-3xl font-bold text-slate-700 mb-8 text-center">Why You're Special</h2>
-                <div class="space-y-6">
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-xl">1</div>
-                        <p class="text-lg text-slate-600 font-medium">You have the kindest heart I've ever known.</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-xl">2</div>
-                        <p class="text-lg text-slate-600 font-medium">Your laugh is literally my favorite sound.</p>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="w-12 h-12 rounded-full bg-rose-100 flex items-center justify-center text-rose-500 text-xl">3</div>
-                        <p class="text-lg text-slate-600 font-medium">You inspire me to be a better person every day.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- The Question Section -->
-        <section class="text-center py-20 min-h-[60vh] flex flex-col items-center justify-center relative">
-            <h2 class="font-handwriting text-5xl md:text-7xl text-rose-600 mb-12">Will you be my Valentine?</h2>
-            
-            <div class="flex flex-col md:flex-row gap-8 items-center justify-center relative w-full h-32">
-                <button id="yesBtn" onclick="acceptValentine()" class="px-12 py-4 bg-rose-500 text-white rounded-full font-bold text-xl shadow-lg hover:bg-rose-600 hover:scale-110 transition-all transform z-10">
-                    YES! 💖
-                </button>
-                
-                <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()" class="px-12 py-4 bg-slate-200 text-slate-500 rounded-full font-bold text-xl hover:bg-slate-300 transition-all absolute md:static">
-                    No 🙈
+                <!-- Mobile Menu Button -->
+                <button class="md:hidden text-white" onclick="alert('Menu toggled')">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                 </button>
             </div>
+        </nav>
 
-            <div id="success-msg" class="hidden mt-12 transform transition-all duration-500">
-                <p class="text-2xl font-bold text-slate-700">Yay! It's a date! 🥂</p>
-                <p class="text-slate-500 mt-2">I'll pick you up at 7 PM.</p>
+        <!-- Hero Section -->
+        <section id="home" class="min-h-screen flex items-center relative">
+            <div class="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="space-y-8 fade-in-section" style="z-index: 20;">
+                    <div class="inline-flex items-center px-4 py-2 border-2 border-teal-500 bg-teal-900/50 rounded-lg text-teal-300 text-sm font-bold uppercase mb-2 transform -skew-x-12">
+                        <span class="w-3 h-3 bg-red-500 mr-2 animate-bounce"></span>
+                        Ultimate Driving Machine
+                    </div>
+                    <h1 class="text-6xl md:text-8xl font-black leading-none tracking-tighter">
+                        STREET <br>
+                        <span class="text-gradient" style="font-size: 1.1em;">DOMINANCE</span>
+                    </h1>
+                    <p class="text-gray-300 text-lg md:text-xl max-w-lg leading-relaxed border-l-4 border-red-500 pl-6 bg-black/20 py-2">
+                        Specialized tuning for high-performance sedans. We turn stock into shock. <span class="text-teal-400 font-bold">CLICK THE CAR</span> to play the Endless Runner!
+                    </p>
+                    <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 pt-4">
+                        <button onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})" class="btn-cartoon">
+                            Check Upgrades
+                        </button>
+                        <button class="btn-cartoon-outline">
+                            View Gallery
+                        </button>
+                    </div>
+                </div>
+                <!-- Right side is empty to show the 3D car model -->
             </div>
         </section>
 
-        <footer class="text-center py-12 text-slate-400 text-sm">
-            Made with ❤️ and code.
+        <!-- Services Section -->
+        <section id="services" class="py-32 relative">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-20 fade-in-section">
+                    <h2 class="text-5xl font-black mb-4 italic text-white" style="text-shadow: 3px 3px 0 var(--primary);">GARAGE SERVICES</h2>
+                    <div class="h-2 w-32 bg-red-500 mx-auto transform -skew-x-12"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Card 1 -->
+                    <div class="glass-panel p-10 service-card fade-in-section group">
+                        <div class="w-16 h-16 bg-teal-900 border-2 border-teal-500 rounded-lg flex items-center justify-center mb-6 shadow-lg transform rotate-3 group-hover:rotate-0 transition-transform">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 text-white uppercase italic">Stage 2 Tuning</h3>
+                        <p class="text-gray-400 font-medium">Push your V8 Twin Turbo to the limit with our aggressive ECU maps and downpipe installations.</p>
+                    </div>
+
+                    <!-- Card 2 -->
+                    <div class="glass-panel p-10 service-card fade-in-section group" style="transition-delay: 100ms;">
+                        <div class="w-16 h-16 bg-teal-900 border-2 border-teal-500 rounded-lg flex items-center justify-center mb-6 shadow-lg transform -rotate-2 group-hover:rotate-0 transition-transform">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 text-white uppercase italic">Suspension Geometry</h3>
+                        <p class="text-gray-400 font-medium">Laser alignment and coilover setup to ensure your M-Car handles like it's on rails.</p>
+                    </div>
+
+                    <!-- Card 3 -->
+                    <div class="glass-panel p-10 service-card fade-in-section group" style="transition-delay: 200ms;">
+                        <div class="w-16 h-16 bg-teal-900 border-2 border-teal-500 rounded-lg flex items-center justify-center mb-6 shadow-lg transform rotate-2 group-hover:rotate-0 transition-transform">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-3 text-white uppercase italic">Custom Exhaust</h3>
+                        <p class="text-gray-400 font-medium">Fabrication of titanium exhaust systems for that signature pops, bangs, and raw roar.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="py-20 border-y-4 border-teal-500 bg-black/50 relative overflow-hidden">
+            <div class="container mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center relative z-10">
+                <div class="fade-in-section">
+                    <div class="text-6xl font-black text-white mb-2 italic" style="-webkit-text-stroke: 2px var(--primary); color: transparent;">0-60</div>
+                    <div class="text-red-500 text-sm font-bold uppercase tracking-widest bg-black inline-block px-2">2.8 Seconds</div>
+                </div>
+                <div class="fade-in-section">
+                    <div class="text-6xl font-black text-white mb-2 italic" style="-webkit-text-stroke: 2px var(--primary); color: transparent;">HP</div>
+                    <div class="text-red-500 text-sm font-bold uppercase tracking-widest bg-black inline-block px-2">625+ Tuned</div>
+                </div>
+                <div class="fade-in-section">
+                    <div class="text-6xl font-black text-white mb-2 italic" style="-webkit-text-stroke: 2px var(--primary); color: transparent;">24h</div>
+                    <div class="text-red-500 text-sm font-bold uppercase tracking-widest bg-black inline-block px-2">Turnaround</div>
+                </div>
+                <div class="fade-in-section">
+                    <div class="text-6xl font-black text-white mb-2 italic" style="-webkit-text-stroke: 2px var(--primary); color: transparent;">100%</div>
+                    <div class="text-red-500 text-sm font-bold uppercase tracking-widest bg-black inline-block px-2">Street Legal</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Form -->
+        <section id="contact" class="py-32">
+            <div class="container mx-auto px-6">
+                <div class="glass-panel max-w-5xl mx-auto rounded-none transform skew-x-[-2deg] flex flex-col md:flex-row fade-in-section border-4 border-white shadow-[10px_10px_0px_var(--primary)]">
+                    <div class="p-12 md:w-5/12 bg-red-600 text-white flex flex-col justify-center relative overflow-hidden">
+                        <h3 class="text-4xl font-black mb-6 italic uppercase">Start Your Build</h3>
+                        <p class="mb-8 font-bold leading-relaxed relative z-10">Don't settle for stock. Book your consultation now and unleash the beast.</p>
+                        
+                        <div class="space-y-6 relative z-10 font-bold">
+                            <div class="flex items-center space-x-4">
+                                <span class="text-2xl">📞</span>
+                                <span class="tracking-wide">+1 (555) M-POWER</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <span class="text-2xl">✉️</span>
+                                <span class="tracking-wide">builds@apex-m.com</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="p-12 md:w-7/12 bg-gray-900">
+                        <form onsubmit="event.preventDefault(); alert('Request sent! We will contact you shortly.');" class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs font-black text-teal-400 mb-2 uppercase tracking-wider">Name</label>
+                                    <input type="text" class="w-full bg-gray-800 border-2 border-gray-700 rounded-none px-4 py-3 text-white focus:outline-none focus:border-teal-500 transition-colors placeholder-gray-600" placeholder="Driver Name">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-black text-teal-400 mb-2 uppercase tracking-wider">Email</label>
+                                    <input type="email" class="w-full bg-gray-800 border-2 border-gray-700 rounded-none px-4 py-3 text-white focus:outline-none focus:border-teal-500 transition-colors placeholder-gray-600" placeholder="email@example.com">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-black text-teal-400 mb-2 uppercase tracking-wider">Car Model</label>
+                                <input type="text" class="w-full bg-gray-800 border-2 border-gray-700 rounded-none px-4 py-3 text-white focus:outline-none focus:border-teal-500 transition-colors placeholder-gray-600" placeholder="e.g. BMW M5 F90">
+                            </div>
+                            <button type="submit" class="w-full py-4 mt-2 btn-cartoon">
+                                LAUNCH PROJECT
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="bg-black py-8 border-t-4 border-teal-500 text-center text-gray-500 text-xs font-bold tracking-widest uppercase">
+            <p>&copy; 2024 APEX M-DIVISION. <span class="text-red-500">NO SPEED LIMITS.</span></p>
         </footer>
-    </main>
+    </div>
 
     <script>
-        // 1. Loading Screen Logic
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const loader = document.getElementById('loader');
-                const main = document.getElementById('main-content');
+        // --- Game State Variables ---
+        let gameActive = false;
+        let isGameOver = false;
+        let carGroup;
+        let wheels = [];
+        let shapesGroup;
+        let sceneryGroup; // New group for scenery
+        let roadGroup;
+        let camera, scene, renderer;
+        let tutorialTimeout;
+        
+        let score = 0;
+        let lastSpawnZ = -20;
+        let collidables = []; 
+        let sceneryCollidables = []; // To manage scenery cleanup
+
+        // Physics & Config
+        const gameConfig = {
+            baseSpeed: 0.8,
+            currentSpeed: 0.8,
+            laneWidth: 3.5,
+            maxX: 6,
+            steerSpeed: 0.3
+        };
+
+        const keys = {
+            a: false,
+            d: false,
+            ArrowLeft: false,
+            ArrowRight: false
+        };
+
+        // --- 3D Scene Implementation ---
+        const init3D = () => {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            
+            // Comic/Toon Fog
+            scene.fog = new THREE.Fog(0x111827, 8, 50); // Increased view distance
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.BasicShadowMap; 
+            container.appendChild(renderer.domElement);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
+            dirLight.position.set(10, 20, 10);
+            dirLight.castShadow = true;
+            dirLight.shadow.mapSize.width = 1024;
+            dirLight.shadow.mapSize.height = 1024;
+            dirLight.shadow.camera.far = 100;
+            dirLight.shadow.camera.left = -30;
+            dirLight.shadow.camera.right = 30;
+            scene.add(dirLight);
+
+            // Rim light
+            const rimLight = new THREE.SpotLight(0x14b8a6, 5);
+            rimLight.position.set(-5, 5, -5);
+            rimLight.lookAt(0,0,0);
+            scene.add(rimLight);
+
+            // --- CAR CONSTRUCTION ---
+            createCar();
+
+            // --- Background Floating Elements (Menu Mode Only) ---
+            shapesGroup = new THREE.Group();
+            const shapeMat = new THREE.MeshToonMaterial({ color: 0x14b8a6 }); 
+            const icoGeo = new THREE.IcosahedronGeometry(0.5, 0);
+            for(let i=0; i<15; i++) {
+                const mesh = new THREE.Mesh(icoGeo, shapeMat);
+                mesh.position.set(
+                    (Math.random() - 0.5) * 30,
+                    (Math.random() - 0.5) * 20 + 5,
+                    (Math.random() - 0.5) * 20 - 10
+                );
+                mesh.rotation.set(Math.random()*Math.PI, Math.random()*Math.PI, 0);
+                shapesGroup.add(mesh);
+            }
+            scene.add(shapesGroup);
+
+            // --- Scenery Group ---
+            sceneryGroup = new THREE.Group();
+            scene.add(sceneryGroup);
+
+            // --- ROAD ---
+            const roadGeo = new THREE.PlaneGeometry(16, 200);
+            const roadMat = new THREE.MeshStandardMaterial({ 
+                color: 0x1f2937, 
+                roughness: 0.8,
+                side: THREE.DoubleSide
+            });
+            const road = new THREE.Mesh(roadGeo, roadMat);
+            road.rotation.x = -Math.PI / 2;
+            road.position.z = -50;
+            road.position.y = -0.05;
+            road.receiveShadow = true;
+            
+            const gridHelper = new THREE.GridHelper(200, 50, 0x14b8a6, 0x14b8a6);
+            gridHelper.position.y = 0.01;
+            gridHelper.position.z = -50;
+            
+            roadGroup = new THREE.Group();
+            roadGroup.add(road);
+            roadGroup.add(gridHelper);
+            scene.add(roadGroup);
+
+            // Camera setup
+            camera.position.set(4, 2, 6);
+            camera.lookAt(0, 0.5, 0);
+            
+            // Input Listeners
+            let mouseX = 0;
+            let mouseY = 0;
+            const raycaster = new THREE.Raycaster();
+            const mouse = new THREE.Vector2();
+
+            window.addEventListener('click', (event) => {
+                if(isGameOver) {
+                    resetGame();
+                    return;
+                }
+                if(gameActive) return;
+                mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(carGroup.children, true);
+                if(intersects.length > 0) startGame();
+            });
+
+            window.addEventListener('touchstart', (e) => {
+                if(!gameActive) return;
+                const touchX = e.touches[0].clientX;
+                if(touchX < window.innerWidth / 2) keys.ArrowLeft = true;
+                else keys.ArrowRight = true;
+            });
+
+            window.addEventListener('touchend', () => {
+                keys.ArrowLeft = false;
+                keys.ArrowRight = false;
+            });
+
+            document.addEventListener('mousemove', (event) => {
+                if(!gameActive) {
+                    mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+                    mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+                }
+            });
+
+            window.addEventListener('keydown', (e) => { 
+                keys[e.key] = true; 
+                if(isGameOver && (e.key === 'Enter' || e.code === 'Space')) {
+                    resetGame();
+                }
+            });
+            window.addEventListener('keyup', (e) => { keys[e.key] = false; });
+
+            window.addEventListener('resize', () => {
+                camera.aspect = window.innerWidth / window.innerHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                if(!gameActive) resetCamera();
+            });
+
+            // Animation Loop
+            const clock = new THREE.Clock();
+            const animate = () => {
+                requestAnimationFrame(animate);
+                const time = clock.getElapsedTime();
+
+                if(!gameActive) {
+                    carGroup.position.set(0, Math.sin(time * 1.5) * 0.05, 0); 
+                    carGroup.rotation.y = -Math.PI / 6 + Math.sin(time * 0.5) * 0.1 + (mouseX * 0.2); 
+                    carGroup.rotation.x = Math.sin(time * 2) * 0.01 + (mouseY * 0.1); 
+                    wheels.forEach(w => w.rotation.x += 0.05);
+                    animateShapes(time);
+                } else if (gameActive && !isGameOver) {
+                    carGroup.position.z -= gameConfig.currentSpeed;
+                    
+                    if(keys.a || keys.ArrowLeft) {
+                        carGroup.position.x -= gameConfig.steerSpeed;
+                        carGroup.rotation.z = 0.1;
+                        carGroup.rotation.y = 0.1;
+                    } else if(keys.d || keys.ArrowRight) {
+                        carGroup.position.x += gameConfig.steerSpeed;
+                        carGroup.rotation.z = -0.1;
+                        carGroup.rotation.y = -0.1;
+                    } else {
+                        carGroup.rotation.z *= 0.8;
+                        carGroup.rotation.y *= 0.8;
+                    }
+                    
+                    if(carGroup.position.x > gameConfig.maxX) carGroup.position.x = gameConfig.maxX;
+                    if(carGroup.position.x < -gameConfig.maxX) carGroup.position.x = -gameConfig.maxX;
+
+                    const gridSnap = Math.floor(carGroup.position.z / 10) * 10;
+                    roadGroup.position.z = gridSnap + 50;
+
+                    spawnWorldElements();
+                    updateCollidables();
+
+                    camera.position.z = carGroup.position.z + 8;
+                    camera.position.y = 4;
+                    camera.position.x = carGroup.position.x * 0.3; 
+                    camera.lookAt(carGroup.position.x, 0, carGroup.position.z - 10);
+
+                    wheels.forEach(w => w.rotation.x += 0.5);
+                    gameConfig.currentSpeed += 0.0001; 
+                    document.getElementById('speed-meter').innerText = Math.floor(gameConfig.currentSpeed * 200);
+                }
+                renderer.render(scene, camera);
+            };
+            animate();
+        };
+
+        // --- SCENERY FUNCTIONS ---
+
+        function createTree(x, z) {
+            const trunkGeo = new THREE.CylinderGeometry(0.2, 0.4, 1, 8);
+            const trunkMat = new THREE.MeshToonMaterial({ color: 0x4B3621 });
+            const leavesGeo = new THREE.ConeGeometry(1.5, 3, 8);
+            const leavesMat = new THREE.MeshToonMaterial({ color: 0x14532d }); // Dark Green
+
+            const trunk = new THREE.Mesh(trunkGeo, trunkMat);
+            trunk.position.y = 0.5;
+            
+            const leaves = new THREE.Mesh(leavesGeo, leavesMat);
+            leaves.position.y = 2.5;
+
+            const group = new THREE.Group();
+            group.add(trunk);
+            group.add(leaves);
+            group.position.set(x, 0, z);
+            
+            sceneryGroup.add(group);
+            sceneryCollidables.push(group);
+        }
+
+        function createBuilding(x, z) {
+            const height = 5 + Math.random() * 10;
+            const geo = new THREE.BoxGeometry(3, height, 3);
+            const mat = new THREE.MeshToonMaterial({ color: 0x1f2937, opacity: 0.9, transparent: true });
+            
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, height/2, z);
+            
+            // Neon strips
+            const neonGeo = new THREE.BoxGeometry(3.1, 0.2, 3.1);
+            const neonMat = new THREE.MeshBasicMaterial({ color: Math.random() > 0.5 ? 0x14b8a6 : 0xef4444 });
+            const neon = new THREE.Mesh(neonGeo, neonMat);
+            neon.position.y = height * 0.8;
+            mesh.add(neon);
+
+            sceneryGroup.add(mesh);
+            sceneryCollidables.push(mesh);
+        }
+
+        function createMountain(x, z) {
+            const height = 15 + Math.random() * 10;
+            const geo = new THREE.ConeGeometry(8, height, 4);
+            const mat = new THREE.MeshToonMaterial({ color: 0x374151 }); // Gray
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, height/3, z);
+            sceneryGroup.add(mesh);
+            sceneryCollidables.push(mesh);
+        }
+
+        function createStreetLight(x, z) {
+            const poleGeo = new THREE.CylinderGeometry(0.1, 0.1, 5);
+            const poleMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+            const pole = new THREE.Mesh(poleGeo, poleMat);
+            pole.position.y = 2.5;
+
+            const armGeo = new THREE.BoxGeometry(1.5, 0.1, 0.1);
+            const arm = new THREE.Mesh(armGeo, poleMat);
+            arm.position.set(x > 0 ? -0.7 : 0.7, 5, 0);
+
+            const lightGeo = new THREE.BoxGeometry(0.3, 0.1, 0.5);
+            const lightMat = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+            const light = new THREE.Mesh(lightGeo, lightMat);
+            light.position.set(x > 0 ? -1.4 : 1.4, 4.9, 0);
+
+            const group = new THREE.Group();
+            group.add(pole);
+            group.add(arm);
+            group.add(light);
+            group.position.set(x, 0, z);
+
+            sceneryGroup.add(group);
+            sceneryCollidables.push(group);
+        }
+
+        // --- CREATION FUNCTIONS (Existing) ---
+        function createCar() {
+             carGroup = new THREE.Group();
+            
+            // Realism Materials
+            const paintMat = new THREE.MeshStandardMaterial({ 
+                color: 0x003366, // Deep Metallic Blue (Marina Bay Blue ish)
+                metalness: 0.6,
+                roughness: 0.4
+            });
+            const carbonMat = new THREE.MeshStandardMaterial({ 
+                color: 0x111111, 
+                metalness: 0.3, 
+                roughness: 0.8 
+            });
+            const chromeMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffffff, 
+                metalness: 0.9, 
+                roughness: 0.1 
+            });
+            const glassMat = new THREE.MeshPhysicalMaterial({ 
+                color: 0x111111, 
+                metalness: 0.9, 
+                roughness: 0.0, 
+                transparent: true, 
+                opacity: 0.7 
+            });
+            const rubberMat = new THREE.MeshStandardMaterial({ 
+                color: 0x111111, 
+                roughness: 0.9 
+            });
+            const lightMat = new THREE.MeshStandardMaterial({ 
+                color: 0xffffff, 
+                emissive: 0xffffff, 
+                emissiveIntensity: 5 
+            });
+             const tailLightMat = new THREE.MeshStandardMaterial({ 
+                color: 0xff0000, 
+                emissive: 0xff0000, 
+                emissiveIntensity: 2 
+            });
+
+            // --- CAR BODY SCULPTING ---
+            
+            // 1. Lower Chassis (Main Block)
+            const chassisGeo = new THREE.BoxGeometry(2.1, 0.5, 4.8);
+            const chassis = new THREE.Mesh(chassisGeo, paintMat);
+            chassis.position.y = 0.5;
+            chassis.castShadow = true;
+            carGroup.add(chassis);
+
+            // 2. Cabin (Greenhouse)
+            const cabinGeo = new THREE.BoxGeometry(1.9, 0.6, 2.2);
+            const cabin = new THREE.Mesh(cabinGeo, glassMat);
+            cabin.position.set(0, 1.0, -0.3); 
+            carGroup.add(cabin);
+            
+            // Roof (Carbon)
+            const roofGeo = new THREE.BoxGeometry(1.92, 0.05, 2.25);
+            const roof = new THREE.Mesh(roofGeo, carbonMat);
+            roof.position.set(0, 1.32, -0.3);
+            carGroup.add(roof);
+
+            // 3. Hood (Sloped)
+            const hoodGeo = new THREE.BoxGeometry(1.9, 0.1, 1.4);
+            const hood = new THREE.Mesh(hoodGeo, paintMat);
+            hood.position.set(0, 0.76, 1.5); // Front
+            carGroup.add(hood);
+
+            // 4. Trunk
+            const trunkGeo = new THREE.BoxGeometry(1.9, 0.1, 0.8);
+            const trunk = new THREE.Mesh(trunkGeo, paintMat);
+            trunk.position.set(0, 0.76, -2.0); // Back
+            carGroup.add(trunk);
+
+            // 5. Bumpers
+            // Front Bumper (Aggressive)
+            const fBumperGeo = new THREE.BoxGeometry(2.1, 0.4, 0.2);
+            const fBumper = new THREE.Mesh(fBumperGeo, paintMat);
+            fBumper.position.set(0, 0.4, 2.45);
+            carGroup.add(fBumper);
+            
+            // Front Splitter (Carbon)
+            const splitterGeo = new THREE.BoxGeometry(2.15, 0.05, 0.3);
+            const splitter = new THREE.Mesh(splitterGeo, carbonMat);
+            splitter.position.set(0, 0.15, 2.5);
+            carGroup.add(splitter);
+
+            // Rear Bumper
+            const rBumperGeo = new THREE.BoxGeometry(2.1, 0.4, 0.2);
+            const rBumper = new THREE.Mesh(rBumperGeo, paintMat);
+            rBumper.position.set(0, 0.4, -2.45);
+            carGroup.add(rBumper);
+            
+            // Diffuser
+            const diffuserGeo = new THREE.BoxGeometry(1.8, 0.15, 0.1);
+            const diffuser = new THREE.Mesh(diffuserGeo, carbonMat);
+            diffuser.position.set(0, 0.2, -2.55);
+            carGroup.add(diffuser);
+
+            // 6. Wheels (More detailed)
+            const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.28, 32);
+            const rimGeo = new THREE.CylinderGeometry(0.28, 0.28, 0.29, 16); 
+            const wheelPositions = [
+                { x: 1.05, z: 1.6 },   // Front Left
+                { x: -1.05, z: 1.6 },  // Front Right
+                { x: 1.05, z: -1.6 },  // Rear Left
+                { x: -1.05, z: -1.6 }  // Rear Right
+            ];
+
+            wheelPositions.forEach(pos => {
+                const wG = new THREE.Group();
+                const tire = new THREE.Mesh(wheelGeo, rubberMat); 
+                tire.rotation.z = Math.PI/2;
+                tire.castShadow = true;
                 
-                loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                    main.style.opacity = '1';
-                    createFloatingHearts();
-                }, 1000);
-            }, 1500); // Fake loading time
+                const rim = new THREE.Mesh(rimGeo, carbonMat); // Black rims
+                rim.rotation.z = Math.PI/2;
+                
+                // Add a center cap
+                const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.30, 8), chromeMat);
+                cap.rotation.z = Math.PI/2;
+
+                wG.add(tire);
+                wG.add(rim);
+                wG.add(cap);
+                wG.position.set(pos.x, 0.42, pos.z);
+                carGroup.add(wG);
+                wheels.push(wG);
+            });
+
+            // 7. Details
+            
+            // Kidney Grilles (Black)
+            const grilleGeo = new THREE.BoxGeometry(0.4, 0.3, 0.05);
+            const grilleL = new THREE.Mesh(grilleGeo, carbonMat); grilleL.position.set(0.22, 0.6, 2.56); carGroup.add(grilleL);
+            const grilleR = new THREE.Mesh(grilleGeo, carbonMat); grilleR.position.set(-0.22, 0.6, 2.56); carGroup.add(grilleR);
+
+            // Headlights (Angel Eyes glow)
+            const hlGeo = new THREE.BoxGeometry(0.5, 0.15, 0.1);
+            const hlL = new THREE.Mesh(hlGeo, lightMat); hlL.position.set(0.8, 0.65, 2.5); carGroup.add(hlL);
+            const hlR = new THREE.Mesh(hlGeo, lightMat); hlR.position.set(-0.8, 0.65, 2.5); carGroup.add(hlR);
+
+            // Tail Lights
+            const tlGeo = new THREE.BoxGeometry(0.6, 0.15, 0.1);
+            const tlL = new THREE.Mesh(tlGeo, tailLightMat); tlL.position.set(0.8, 0.65, -2.5); carGroup.add(tlL);
+            const tlR = new THREE.Mesh(tlGeo, tailLightMat); tlR.position.set(-0.8, 0.65, -2.5); carGroup.add(tlR);
+
+            // Quad Exhausts
+            const exGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.2, 16);
+            const ex1 = new THREE.Mesh(exGeo, chromeMat); ex1.rotation.x = Math.PI/2; ex1.position.set(0.5, 0.25, -2.6);
+            const ex2 = new THREE.Mesh(exGeo, chromeMat); ex2.rotation.x = Math.PI/2; ex2.position.set(0.7, 0.25, -2.6);
+            const ex3 = new THREE.Mesh(exGeo, chromeMat); ex3.rotation.x = Math.PI/2; ex3.position.set(-0.5, 0.25, -2.6);
+            const ex4 = new THREE.Mesh(exGeo, chromeMat); ex4.rotation.x = Math.PI/2; ex4.position.set(-0.7, 0.25, -2.6);
+            carGroup.add(ex1); carGroup.add(ex2); carGroup.add(ex3); carGroup.add(ex4);
+
+            // Spoiler (Lip)
+            const spoilerGeo = new THREE.BoxGeometry(1.9, 0.05, 0.2);
+            const spoiler = new THREE.Mesh(spoilerGeo, carbonMat); 
+            spoiler.position.set(0, 0.82, -2.4); 
+            spoiler.rotation.x = 0.1;
+            carGroup.add(spoiler);
+            
+            scene.add(carGroup);
+        }
+
+        function animateShapes(time) {
+            shapesGroup.children.forEach((child, i) => {
+                child.rotation.x += 0.01;
+                child.rotation.y += 0.01;
+                child.position.y += Math.sin(time + i) * 0.01;
+            });
+        }
+
+        function spawnWorldElements() {
+            if (carGroup.position.z < lastSpawnZ + 10) {
+                lastSpawnZ -= 20;
+                
+                // --- Game Objects (Road) ---
+                const lane = (Math.floor(Math.random() * 3) - 1) * 3;
+                const type = Math.random() > 0.3 ? 'obstacle' : 'coin';
+
+                if(type === 'obstacle') createObstacle(lane, lastSpawnZ);
+                else createCoin(lane, lastSpawnZ);
+                
+                if(Math.random() > 0.5) {
+                    const lane2 = (Math.floor(Math.random() * 3) - 1) * 3;
+                    if(lane2 !== lane) createCoin(lane2, lastSpawnZ);
+                }
+
+                // --- Scenery (Sides) ---
+                const sceneryZ = lastSpawnZ + (Math.random() * 10 - 5);
+                
+                // Left Side Scenery (-12 to -30)
+                const leftX = -10 - Math.random() * 20;
+                spawnSceneryItem(leftX, sceneryZ);
+                
+                // Right Side Scenery (12 to 30)
+                const rightX = 10 + Math.random() * 20;
+                spawnSceneryItem(rightX, sceneryZ);
+            }
+        }
+
+        function spawnSceneryItem(x, z) {
+            const rand = Math.random();
+            if(rand < 0.3) createTree(x, z);
+            else if(rand < 0.6) createBuilding(x, z);
+            else if(rand < 0.8) createMountain(x, z);
+            else createStreetLight(x, z);
+        }
+
+        function createObstacle(x, z) {
+            const geo = new THREE.BoxGeometry(2, 2, 2);
+            const mat = new THREE.MeshToonMaterial({ color: 0xef4444 });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, 1, z);
+            mesh.castShadow = true;
+            scene.add(mesh);
+            collidables.push({ mesh: mesh, type: 'obstacle', active: true });
+        }
+
+        function createCoin(x, z) {
+            const geo = new THREE.TorusGeometry(0.8, 0.2, 8, 16);
+            const mat = new THREE.MeshToonMaterial({ color: 0xfacc15 });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(x, 1.5, z);
+            mesh.castShadow = true;
+            scene.add(mesh);
+            collidables.push({ mesh: mesh, type: 'coin', active: true });
+        }
+
+        function updateCollidables() {
+            const carPos = carGroup.position;
+            
+            // Collisions
+            collidables.forEach((obj, index) => {
+                if(!obj.active) return;
+                if(obj.type === 'coin') obj.mesh.rotation.y += 0.1;
+                
+                const dist = obj.mesh.position.distanceTo(carPos);
+                if(dist < 2.5) {
+                    if(obj.type === 'obstacle') triggerGameOver();
+                    else if (obj.type === 'coin') collectCoin(obj);
+                }
+
+                if(obj.mesh.position.z > carPos.z + 10) {
+                    scene.remove(obj.mesh);
+                    obj.active = false;
+                }
+            });
+
+            // Scenery Cleanup
+            sceneryCollidables.forEach((mesh, index) => {
+                if(mesh.position.z > carPos.z + 20) {
+                    sceneryGroup.remove(mesh);
+                    // ideally remove from array too, simplified for demo
+                }
+            });
+        }
+
+        function collectCoin(obj) {
+            obj.active = false;
+            scene.remove(obj.mesh);
+            score += 100;
+            document.getElementById('score-display').innerText = score;
+        }
+
+        function triggerGameOver() {
+            isGameOver = true;
+            document.getElementById('game-over-screen').style.display = 'flex';
+            document.getElementById('final-score').innerText = score;
+            document.getElementById('game-ui').style.display = 'none';
+        }
+
+        function resetCamera() {
+            if(window.innerWidth < 768) {
+                camera.position.set(0, 3, 7);
+                camera.lookAt(0, 0, 0);
+            } else {
+                camera.position.set(4, 2, 6);
+                camera.lookAt(0, 0.5, 0);
+            }
+        }
+
+        function startGame() {
+            gameActive = true;
+            isGameOver = false;
+            score = 0;
+            gameConfig.currentSpeed = gameConfig.baseSpeed;
+            document.getElementById('score-display').innerText = '0';
+            
+            // UI
+            document.getElementById('content').style.opacity = '0';
+            document.getElementById('content').style.pointerEvents = 'none';
+            document.getElementById('game-ui').style.display = 'block';
+            document.getElementById('game-over-screen').style.display = 'none';
+            
+            // Tutorial Auto-Hide
+            const tutText = document.getElementById('tutorial-text');
+            tutText.style.opacity = '1';
+            clearTimeout(tutorialTimeout);
+            tutorialTimeout = setTimeout(() => {
+                tutText.style.opacity = '0';
+            }, 5000);
+
+            // Reset World
+            carGroup.position.set(0, 0, 0);
+            carGroup.rotation.set(0, Math.PI, 0); 
+            lastSpawnZ = -20;
+            
+            collidables.forEach(c => scene.remove(c.mesh));
+            collidables = [];
+            
+            // Clear Scenery
+            while(sceneryGroup.children.length > 0){ 
+                sceneryGroup.remove(sceneryGroup.children[0]); 
+            }
+            sceneryCollidables = [];
+
+            shapesGroup.visible = false;
+        }
+
+        window.resetGame = function() {
+            startGame();
+        };
+
+        window.stopGame = function() {
+            gameActive = false;
+            isGameOver = false;
+            document.getElementById('content').style.opacity = '1';
+            document.getElementById('game-ui').style.display = 'none';
+            document.getElementById('game-over-screen').style.display = 'none';
+            
+            collidables.forEach(c => scene.remove(c.mesh));
+            collidables = [];
+            while(sceneryGroup.children.length > 0){ 
+                sceneryGroup.remove(sceneryGroup.children[0]); 
+            }
+            sceneryCollidables = [];
+            
+            shapesGroup.visible = true;
+            carGroup.position.set(0, 0, 0);
+            resetCamera();
+        };
+
+        init3D();
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
         });
 
-        // 2. Floating Hearts Background
-        function createFloatingHearts() {
-            const container = document.getElementById('heart-container');
-            const heartCount = 20; // Number of background hearts
-
-            for(let i = 0; i < heartCount; i++) {
-                const heart = document.createElement('div');
-                heart.innerHTML = '❤️';
-                heart.classList.add('floating-heart');
-                
-                // Random positioning and sizing
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.animationDuration = (Math.random() * 10 + 10) + 's'; // 10-20s float time
-                heart.style.fontSize = (Math.random() * 20 + 10) + 'px';
-                heart.style.animationDelay = Math.random() * 5 + 's';
-                
-                container.appendChild(heart);
-            }
-        }
-
-        // 3. The "Running Away" No Button
-        const noBtn = document.getElementById('noBtn');
-        const yesBtn = document.getElementById('yesBtn');
-        
-        function moveButton() {
-            // Get viewport dimensions
-            const maxWidth = window.innerWidth - noBtn.offsetWidth - 20;
-            const maxHeight = window.innerHeight - noBtn.offsetHeight - 20;
-
-            // Generate random position
-            const newX = Math.random() * maxWidth;
-            const newY = Math.random() * maxHeight;
-
-            // Make it absolute positioning to move freely
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = newX + 'px';
-            noBtn.style.top = newY + 'px';
-            
-            // Add a funny scale effect
-            noBtn.style.transform = 'scale(0.9)';
-            
-            // Make the YES button grow slightly to encourage clicking it
-            let currentScale = parseFloat(yesBtn.style.transform.replace('scale(', '')) || 1;
-            yesBtn.style.transform = `scale(${currentScale + 0.1})`;
-        }
-
-        // 4. Acceptance Logic & Confetti
-        function acceptValentine() {
-            const successMsg = document.getElementById('success-msg');
-            const noButton = document.getElementById('noBtn');
-            
-            // Hide No button
-            noButton.style.display = 'none';
-            
-            // Show message
-            successMsg.classList.remove('hidden');
-            successMsg.classList.add('animate-bounce');
-
-            // Trigger Confetti
-            var duration = 3 * 1000;
-            var animationEnd = Date.now() + duration;
-            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
-
-            function randomInRange(min, max) {
-              return Math.random() * (max - min) + min;
-            }
-
-            var interval = setInterval(function() {
-              var timeLeft = animationEnd - Date.now();
-
-              if (timeLeft <= 0) {
-                return clearInterval(interval);
-              }
-
-              var particleCount = 50 * (timeLeft / duration);
-              // since particles fall down, start a bit higher than random
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
-              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
-            }, 250);
-        }
     </script>
 </body>
 </html>
